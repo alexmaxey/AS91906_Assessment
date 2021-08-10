@@ -9,19 +9,19 @@
     a2:"5",
     a3:"7",
     a4:"9",
-    selection:"",
     answer:"7",
+    selection:"", 
     result:""},
 
-    {question:"",
+    {question:"What has many teeth but can't bite?",
     type:"word",
-    answer:"",
+    answer:"comb",
     selection:"",
     result:""},
 
-    {question:"",
+    {question:"If there are three apples and you take away two, how many apples do you have?",
     type:"number",
-    answer:"",
+    answer:"2",
     selection:"",
     result:""},
   ]
@@ -31,12 +31,22 @@ function submit(){
     questions[i].result = 'Correct'
     points += 1
   } else {
-    questions[i].result = 'Wrong'
+    questions[i].result = "Wrong. The correct answer was '" + questions[i].answer + "'."
   }
 }
 function next(){
   i += 1
   answering = true
+}
+function reset(){
+  i = 0
+  points = 0
+  answering = true
+  for (let r = 0; r < questions.length; r++) {
+        questions[r].selection = ""
+        questions[r].result = ""
+      }
+ 
 }
 </script>
 
@@ -64,6 +74,10 @@ function next(){
   <input type="radio" bind:group={questions[i].selection} value={questions[i].a4}>
   {questions[i].a4}
 </label>
+{:else if (questions[i].type == 'word')}
+<input type="text" bind:value={questions[i].selection}>
+{:else if (questions[i].type == 'number')}
+<input type="number" bind:value={questions[i].selection}>
 {/if}
 <br>
 {questions[i].result}
@@ -78,7 +92,10 @@ function next(){
 </button>
 {/if}
 {:else}
-You got {points} / {questions.length}
+Well done, you got {points} / {questions.length}!
+<button on:click={reset}>
+  Play again
+</button>
 {/if}
 
 
