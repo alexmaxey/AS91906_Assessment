@@ -2,7 +2,7 @@
   let i = 0
   let points = 0
   let answering = true
-    let questions = [
+  let library = [
     {question:"I am an odd number. Take away a letter and I become even. What am I?",
     type:"multi",
     a1:"3",
@@ -25,6 +25,8 @@
     selection:"",
     result:""},
   ]
+    let questions = library.sort(function(a, b){return 0.5 - Math.random()});
+    questions.splice(2, questions.length)
 function submit(){
   answering = false
   if (questions[i].selection == questions[i].answer){
