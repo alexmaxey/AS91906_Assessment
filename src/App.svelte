@@ -3,6 +3,9 @@
   let points = 0
   let input = ''
   let lower = ''
+  let name = ''
+  let age = 0 
+  let named = false
   let answering = true
   let library = [
     {question:"I am an odd number. Take away a letter and I become even. What am I?",
@@ -164,7 +167,11 @@
     result:""},
   ]
     let questions = library.sort(function(a, b){return 0.5 - Math.random()});
-    questions.splice(10, questions.length)
+    questions.splice(3, questions.length)
+
+let leaderboard = [
+
+]
 function submit(){
   input = questions[i].selection
   lower = input.toLowerCase()
@@ -191,65 +198,92 @@ function next(){
   answering = true
 }
 function reset(){
+  leaderboard.splice(leaderboard.length, 0, {name:name, age:age, points:points})
   i = 0
   points = 0
   answering = true
+  named = false
   for (let r = 0; r < questions.length; r++) {
         questions[r].selection = ""
         questions[r].result = ""
       }
  
 }
+function begin(){
+  named = true
+}
 </script>
 
 <h1>Riddles</h1>
-{#if (i < questions.length)}
-{questions[i].question}
-<br>
-{#if (questions[i].type == 'multi')}
-<label>
-  <input type="radio" bind:group={questions[i].selection} value={questions[i].a1}>
-  {questions[i].a1}
-</label>
-<br>
-<label>
-  <input type="radio" bind:group={questions[i].selection} value={questions[i].a2}>
-  {questions[i].a2}
-</label>
-<br>
-<label>
-  <input type="radio" bind:group={questions[i].selection} value={questions[i].a3}>
-  {questions[i].a3}
-</label>
-<br>
-<label>
-  <input type="radio" bind:group={questions[i].selection} value={questions[i].a4}>
-  {questions[i].a4}
-</label>
-{:else if (questions[i].type == 'word')}
-<input type="text" bind:value={questions[i].selection}>
-{:else if (questions[i].type == 'number')}
-<input type="number" bind:value={questions[i].selection}>
-{/if}
-<br>
-{questions[i].result}
-<br>
-{#if answering}
-<button on:click={submit}>
-  Submit
-</button>
+{#if named}
+  {#if (i < questions.length)}
+  {questions[i].question}
+  <br>
+      {#if (questions[i].type == 'multi')}
+      <label>
+        <input type="radio" bind:group={questions[i].selection} value={questions[i].a1}>
+        {questions[i].a1}
+      </label>
+      <br>
+      <label>
+        <input type="radio" bind:group={questions[i].selection} value={questions[i].a2}>
+        {questions[i].a2}
+      </label>
+      <br>
+      <label>
+        <input type="radio" bind:group={questions[i].selection} value={questions[i].a3}>
+        {questions[i].a3}
+      </label>
+      <br>
+      <label>
+        <input type="radio" bind:group={questions[i].selection} value={questions[i].a4}>
+        {questions[i].a4}
+      </label>
+      {:else if (questions[i].type == 'word')}
+      <input type="text" bind:value={questions[i].selection}>
+      {:else if (questions[i].type == 'number')}
+      <input type="number" bind:value={questions[i].selection}>
+      {/if}
+  <br>
+  {questions[i].result}
+  <br>
+    {#if answering}
+    <button on:click={submit}>
+      Submit
+    </button>
+    {:else}
+    <button on:click={next}>
+      Next
+    </button>
+    {/if}
+  {:else}
+    Well done, you got {points} / {questions.length}!
+    <button on:click={reset}>
+      Play again
+    </button>
+    <br>
+    Leaderboard:
+    <br>
+    {#each leaderboard as score}
+    Name: {score.name}
+    Age: {score.age}
+    Score: {score.points} / {questions.length}
+    <br>
+    {/each}
+  {/if}
 {:else}
-<button on:click={next}>
-  Next
-</button>
+  <label>
+  Name:
+  <input type="text" bind:value={name}>
+  </label>
+  <br>
+  <label>
+  Age:
+  <input type="number" bind:value={age}>
+  </label>
+  <button on:click={begin}>
+    Submit
+  </button>
 {/if}
-{:else}
-Well done, you got {points} / {questions.length}!
-<button on:click={reset}>
-  Play again
-</button>
-{/if}
-
-{lower}
 
 
