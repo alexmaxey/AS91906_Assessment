@@ -120,43 +120,43 @@
 
     {question:"Which is heavier: a ton of bricks or a ton of feathers?",
     type:"word",
-    answer:"neither both",
+    answer:"neither",
     selection:"",
     result:""},
 
     {question:"What is black when it’s clean and white when it’s dirty?",
     type:"word",
-    answer:"a blackboard",
+    answer:"blackboard",
     selection:"",
     result:""},
 
-    {question:"",
+    {question:"What is full of holes but still holds water?",
     type:"word",
-    answer:"",
+    answer:"sponge",
     selection:"",
     result:""},
 
-    {question:"",
+    {question:"What is always infront of you but can't be seen?",
     type:"word",
-    answer:"",
+    answer:"future",
     selection:"",
     result:""},
 
-    {question:"",
+    {question:"What goes up but never comes down?",
     type:"word",
-    answer:"",
+    answer:"age",
     selection:"",
     result:""},
 
-    {question:"",
+    {question:"The more of this there is, the less you see. What is it?",
     type:"word",
-    answer:"",
+    answer:"darkness",
     selection:"",
     result:""},
 
-    {question:"",
+    {question:"What has hands, but can't clap?",
     type:"word",
-    answer:"",
+    answer:"clock",
     selection:"",
     result:""},
 
@@ -166,18 +166,16 @@
     selection:"",
     result:""},
   ]
-    let questions = library.sort(function(a, b){return 0.5 - Math.random()});
-    questions.splice(3, questions.length)
+let questions = library.sort(function(a, b){return 0.5 - Math.random()});
+questions.splice(3, questions.length)
 
-let leaderboard = [
-
-]
+let leaderboard = []
 function submit(){
   input = questions[i].selection
   lower = input.toLowerCase()
   answering = false
   if (questions[i].type == 'word'){
-    if (questions[i].answer.includes(lower)){
+    if (lower.includes(questions[i].answer)){
     questions[i].result = 'Correct'
     points += 1
     } else {
@@ -203,6 +201,8 @@ function reset(){
   points = 0
   answering = true
   named = false
+  name = ""
+  age = 0
   for (let r = 0; r < questions.length; r++) {
         questions[r].selection = ""
         questions[r].result = ""
@@ -212,6 +212,21 @@ function reset(){
 function begin(){
   named = true
 }
+
+document.addEventListener('keyup', (event) => {
+  if (event.keyCode === 13){
+    if (named === false){
+      begin()
+    } else if (answering === true){
+      submit()
+    } else if (answering === false){
+      next()
+    }
+  }
+  
+
+});
+
 </script>
 
 <h1>Riddles</h1>
@@ -257,19 +272,24 @@ function begin(){
     </button>
     {/if}
   {:else}
-    Well done, you got {points} / {questions.length}!
+    Well done {name}, you got {points} / {questions.length}!
     <button on:click={reset}>
       Play again
     </button>
     <br>
     Leaderboard:
     <br>
+    
     {#each leaderboard as score}
     Name: {score.name}
     Age: {score.age}
     Score: {score.points} / {questions.length}
     <br>
     {/each}
+    Name: {name}
+    Age: {age}
+    Score: {points} / {questions.length}
+    <br>
   {/if}
 {:else}
   <label>
