@@ -5,6 +5,7 @@
   let lower = ''
   let name = ''
   let age = 0 
+  let game_length = 3
   let named = false
   let answering = true
   let library = [
@@ -154,6 +155,13 @@
     selection:"",
     result:""},
 
+    {question:"What has one eye but can't see?",
+    type:"word",
+    answer:"needle",
+    selection:"",
+    result:""},
+
+
     {question:"What has hands, but can't clap?",
     type:"word",
     answer:"clock",
@@ -167,7 +175,7 @@
     result:""},
   ]
 let questions = library.sort(function(a, b){return 0.5 - Math.random()});
-questions.splice(3, questions.length)
+questions.splice(game_length, questions.length)
 
 let leaderboard = []
 function submit(){
@@ -194,9 +202,12 @@ function submit(){
 function next(){
   i += 1
   answering = true
+  if (i === questions.length){
+    leaderboard.splice(leaderboard.length, 0, {name:name, age:age, points:points})
+  }
 }
 function reset(){
-  leaderboard.splice(leaderboard.length, 0, {name:name, age:age, points:points})
+  
   i = 0
   points = 0
   answering = true
@@ -208,6 +219,20 @@ function reset(){
         questions[r].result = ""
       }
  
+}
+
+function again(){
+  
+  for (let r = 0; r < questions.length; r++) {
+    questions[r].selection = ""
+    questions[r].result = ""
+  }
+  points = 0
+  named = true
+  answering = true
+  let questions = library.sort(function(a, b){return 0.5 - Math.random()});
+  questions.splice(game_length, questions.length)
+  i = 0
 }
 function begin(){
   named = true
@@ -274,22 +299,42 @@ document.addEventListener('keyup', (event) => {
   {:else}
     Well done {name}, you got {points} / {questions.length}!
     <button on:click={reset}>
+      New player
+    </button>
+    <button on:click={again}>
       Play again
     </button>
     <br>
     Leaderboard:
     <br>
+
+    <table>
+      <tr>
+        <th>
+          Name
+        </th>
+        <th>
+          Age
+        </th>
+        <th>
+          Score
+        </th>
+      </tr>
+      {#each leaderboard as score}
+      <tr>
+        <th>
+          {score.name}
+        </th>
+        <th>
+          {score.age}
+        </th>
+        <th>
+          {score.points} / {questions.length}
+        </th>
+      </tr>
+      {/each}
+    </table>
     
-    {#each leaderboard as score}
-    Name: {score.name}
-    Age: {score.age}
-    Score: {score.points} / {questions.length}
-    <br>
-    {/each}
-    Name: {name}
-    Age: {age}
-    Score: {points} / {questions.length}
-    <br>
   {/if}
 {:else}
   <label>
@@ -306,4 +351,12 @@ document.addEventListener('keyup', (event) => {
   </button>
 {/if}
 
+<style>
+  table {
+    width: 100%;
+  }
+  table, tr, th {
+    border: black solid 2px;
+  }
+</style>
 
