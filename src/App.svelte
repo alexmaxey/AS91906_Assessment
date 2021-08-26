@@ -8,6 +8,7 @@
   let game_length = 3
   let named = false
   let answering = true
+  let questions = []
   let library = [
     {question:"I am an odd number. Take away a letter and I become even. What am I?",
     type:"multi",
@@ -174,8 +175,12 @@
     selection:"",
     result:""},
   ]
-let questions = library.sort(function(a, b){return 0.5 - Math.random()});
-questions.splice(game_length, questions.length)
+
+function shuffle(){
+  questions = library.sort(function(a, b){return 0.5 - Math.random()});
+  questions.splice(game_length, questions.length)
+}
+
 
 let leaderboard = []
 function submit(){
@@ -222,33 +227,39 @@ function reset(){
 }
 
 function again(){
-  
-  for (let r = 0; r < questions.length; r++) {
-    questions[r].selection = ""
-    questions[r].result = ""
-  }
+    i = 0
   points = 0
-  named = true
   answering = true
-  let questions = library.sort(function(a, b){return 0.5 - Math.random()});
-  questions.splice(game_length, questions.length)
-  i = 0
+
+  named = true
+  for (let r = 0; r < questions.length; r++) {
+        questions[r].selection = ""
+        questions[r].result = ""
+      }
+
+  shuffle()
+
 }
+
 function begin(){
   named = true
+  shuffle()
 }
 
 document.addEventListener('keyup', (event) => {
   if (event.keyCode === 13){
     if (named === false){
       begin()
-    } else if (answering === true){
+    } else if (i >= questions.length){
+      again()
+    }else if (answering === true){
       submit()
     } else if (answering === false){
       next()
-    }
+    } 
   }
   
+
 
 });
 
@@ -301,9 +312,11 @@ document.addEventListener('keyup', (event) => {
     <button on:click={reset}>
       New player
     </button>
+
     <button on:click={again}>
       Play again
     </button>
+
     <br>
     Leaderboard:
     <br>
@@ -351,12 +364,17 @@ document.addEventListener('keyup', (event) => {
   </button>
 {/if}
 
+{i}
+{answering}
+{named}
 <style>
   table {
     width: 100%;
+    border-collapse: collapse;
   }
   table, tr, th {
-    border: black solid 2px;
+    border: black
+     solid 2px;
   }
 </style>
 
