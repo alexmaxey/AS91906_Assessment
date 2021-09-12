@@ -13,10 +13,7 @@
   let questions = []
   let library = []
   let leaderboard = []
-
-// Shuffles the questions randomly and cuts them to the game length
-function shuffle(){
-  questions = []
+  let changeLength = false
     library = [
     {question:"I am an odd number. Take away a letter and I become even. What am I?",
     type:"multi",
@@ -198,7 +195,11 @@ function shuffle(){
     result:"",
     number:"21"},
   ]
-  questions = library.sort(function(a, b){return 0.5 - Math.random()});
+// Shuffles the questions randomly and cuts them to the game length
+function shuffle(){
+
+  questions = library.slice()
+  questions = questions.sort(function(a, b){return 0.5 - Math.random()});
   questions.splice(game_length, questions.length)
 }
 // Activates when the user clicks submit. Checks the answer they put in against the correct answer and provides feedback. If correct they gain a point and are told it is correct. If incorrect they are told the correct answer. 
@@ -228,7 +229,7 @@ function next(){
   i += 1
   answering = true
   if (i === questions.length){
-    leaderboard.splice(leaderboard.length, 0, {name:name, age:age, points:points})
+    leaderboard.splice(leaderboard.length, 0, {name:name, age:age, points:points, length:game_length})
   }
 }
 // Resets the player name and age, but doesn't change the questions.
@@ -247,6 +248,7 @@ function reset(){
 }
 // Play again function. The player stays the same and the questions are changed.
 function again(){
+  changeLength = false
   shuffle() 
   i = 0
   points = 0
@@ -271,6 +273,11 @@ function begin(){
   }
   first_time = false
 }
+// Runs after they choose the game length, and refreshes the questions
+function chosenLength(){
+  changeLength = true
+  shuffle()
+}
 // Allows users to press enter rather than clicking the button
 document.addEventListener('keyup', (event) => {
   if (event.keyCode === 13){
@@ -289,90 +296,110 @@ document.addEventListener('keyup', (event) => {
 </script>
 
 <h1>Riddles</h1>
+<!-- checks if a name has been chosen -->
 {#if named}
-  {#if (i < questions.length)}
-  {questions[i].question} {questions[i].number}
-  <br>
-      {#if (questions[i].type == 'multi')}
-      <label>
-        <input type="radio" bind:group={questions[i].selection} value={questions[i].a1}>
-        {questions[i].a1}
-      </label>
-      <br>
-      <label>
-        <input type="radio" bind:group={questions[i].selection} value={questions[i].a2}>
-        {questions[i].a2}
-      </label>
-      <br>
-      <label>
-        <input type="radio" bind:group={questions[i].selection} value={questions[i].a3}>
-        {questions[i].a3}
-      </label>
-      <br>
-      <label>
-        <input type="radio" bind:group={questions[i].selection} value={questions[i].a4}>
-        {questions[i].a4}
-      </label>
-      {:else if (questions[i].type == 'word')}
-      <input type="text" bind:value={questions[i].selection}>
-      {:else if (questions[i].type == 'number')}
-      <input type="number" bind:value={questions[i].selection}> {questions[i].selection}
+<!-- checks that a game length has been selected -->
+  {#if changeLength}
+  <!-- checks that the game is still in progress; not all the questions have been answered -->
+    {#if (i < questions.length)}
+    <!-- the question -->
+    {questions[i].question} 
+    <br>
+    <!-- if the question is a multichoice question, it shows all the choices as radio buttons -->
+        {#if (questions[i].type == 'multi')}
+        <label>
+          <input type="radio" bind:group={questions[i].selection} value={questions[i].a1}>
+          {questions[i].a1}
+        </label>
+        <br>
+        <label>
+          <input type="radio" bind:group={questions[i].selection} value={questions[i].a2}>
+          {questions[i].a2}
+        </label>
+        <br>
+        <label>
+          <input type="radio" bind:group={questions[i].selection} value={questions[i].a3}>
+          {questions[i].a3}
+        </label>
+        <br>
+        <label>
+          <input type="radio" bind:group={questions[i].selection} value={questions[i].a4}>
+          {questions[i].a4}
+        </label>
+        <!-- if the question is a word answer question, it shows a text box to put the answer in -->
+        {:else if (questions[i].type == 'word')}
+        <input type="text" bind:value={questions[i].selection}>
+        {/if}
+    <br>
+    <!-- shows the result (correct or incorrect) after the submit button has been clicked -->
+    {questions[i].result}
+    <br>
+<!-- either shows the submit button or the next button -->
+      {#if answering}
+      <button on:click={submit}>
+        Submit
+      </button>
+      {:else}
+      <button on:click={next}>
+        Next
+      </button>
       {/if}
-  <br>
-  {questions[i].result}
-  <br>
-
-    {#if answering}
-    <button on:click={submit}>
-      Submit
-    </button>
+    <!-- if all the questions have been answered, it shows the points the user got -->
     {:else}
-    <button on:click={next}>
-      Next
-    </button>
+      Well done {name}, you got {points} / {questions.length}!
+      <!-- the reset button - so the player is changed but the questions stay the same -->
+      <button on:click={reset}>
+        New player
+      </button>
+      <!-- the play again button, lets the user keep the same name and age but change the questions -->
+      <button on:click={again}>
+        Play again
+      </button>
+<!-- the leaderboard, which shows all the previous scores from that 'session' of playing the quiz. this means the user can see their previous scores, and what other people got if playing with others -->
+      <br>
+      Leaderboard:
+      <br>
+
+      <table>
+        <tr>
+          <th>
+            Name
+          </th>
+          <th>
+            Age
+          </th>
+          <th>
+            Score
+          </th>
+        </tr>
+        {#each leaderboard as score}
+        <tr>
+          <th>
+            {score.name}
+          </th>
+          <th>
+            {score.age}
+          </th>
+          <th>
+            {score.points} / {score.length}
+          </th>
+        </tr>
+        {/each}
+      </table>
     {/if}
-  {:else}
-    Well done {name}, you got {points} / {questions.length}!
-    <button on:click={reset}>
-      New player
-    </button>
-
-    <button on:click={again}>
-      Play again
-    </button>
-
-    <br>
-    Leaderboard:
-    <br>
-
-    <table>
-      <tr>
-        <th>
-          Name
-        </th>
-        <th>
-          Age
-        </th>
-        <th>
-          Score
-        </th>
-      </tr>
-      {#each leaderboard as score}
-      <tr>
-        <th>
-          {score.name}
-        </th>
-        <th>
-          {score.age}
-        </th>
-        <th>
-          {score.points} / {questions.length}
-        </th>
-      </tr>
-      {/each}
-    </table>
-    
-  {/if}
+    <!-- if a game length has not been selected, shows the game length slider and a submit button -->
+    {:else}
+      <label>
+        Game length:
+        <input type="range" min="1" max="20" bind:value={game_length}>
+        {game_length}
+        <br>
+        <button on:click={chosenLength}>
+          Submit
+        </button>
+      </label>
+    {/if}
+<!-- if the user has not entered a name, shows the name and age input -->
 {:else}
   <label>
   Name:
@@ -387,6 +414,7 @@ document.addEventListener('keyup', (event) => {
     Submit
   </button>
   <br>
+  <!-- error message if they don't enter a name or enter an invalid age -->
   {error_message}
 {/if}
 
