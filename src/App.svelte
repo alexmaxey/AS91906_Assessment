@@ -204,27 +204,30 @@ function shuffle(){
         questions[r].result = ""
   }
 }
-// Activates when the user clicks submit. Checks the answer they put in against the correct answer and provides feedback. If correct they gain a point and are told it is correct. If incorrect they are told the correct answer. 
+// Activates when the user clicks submit. Checks that they have entered an answer. Checks the answer they put in against the correct answer and provides feedback. If correct they gain a point and are told it is correct. If incorrect they are told the correct answer. 
 function submit(){
   input = questions[i].selection
   lower = input.toLowerCase()
-  answering = false
-
-  if (questions[i].type == 'word') {
-    if (lower.includes(questions[i].answer)){
-    questions[i].result = 'Correct'
-    points += 1
-    } else {
-    questions[i].result = "Wrong. The correct answer was '" + questions[i].answer + "'."
-    }
+  if (questions[i].selection === ''){
+    questions[i].result = 'Please answer the question.'
   } else {
-    if (questions[i].selection === questions[i].answer){
-    questions[i].result = 'Correct'
-    points += 1
+    answering = false
+    if (questions[i].type == 'word') {
+      if (lower.includes(questions[i].answer)){
+      questions[i].result = 'Correct'
+      points += 1
+      } else {
+      questions[i].result = "Wrong. The correct answer was '" + questions[i].answer + "'."
+      }
     } else {
-    questions[i].result = "Wrong. The correct answer was '" + questions[i].answer + "'."
-    }
-  } 
+      if (questions[i].selection === questions[i].answer){
+      questions[i].result = 'Correct'
+      points += 1
+      } else {
+      questions[i].result = "Wrong. The correct answer was '" + questions[i].answer + "'."
+      }
+    } 
+  }
 }
 // Brings up the next question, if the user has finished all the questions it adds their score, name, and age to the leaderboard. 
 function next(){
@@ -347,6 +350,7 @@ document.addEventListener('keyup', (event) => {
     <!-- if all the questions have been answered, it shows the points the user got -->
     {:else}
       Well done {name}, you got {points} / {questions.length}!
+      <br>
       <!-- the reset button - so the player is changed but the questions stay the same -->
       <button on:click={reset}>
         New player
