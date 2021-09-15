@@ -6,15 +6,14 @@
   let name = ''
   let first_time = true
   let age = 0 
-  let game_length = 3
+  let game_length = 10
   let named = false
   let error_message = ''
   let answering = true
   let questions = []
-  let library = []
   let leaderboard = []
   let changeLength = false
-    library = [
+  let library = [
     {question:"I am an odd number. Take away a letter and I become even. What am I?",
     type:"multi",
     a1:"3",
@@ -197,10 +196,13 @@
   ]
 // Shuffles the questions randomly and cuts them to the game length
 function shuffle(){
-
   questions = library.slice()
   questions = questions.sort(function(a, b){return 0.5 - Math.random()});
   questions.splice(game_length, questions.length)
+  for (let r = 0; r < questions.length; r++) {
+        questions[r].selection = ""
+        questions[r].result = ""
+  }
 }
 // Activates when the user clicks submit. Checks the answer they put in against the correct answer and provides feedback. If correct they gain a point and are told it is correct. If incorrect they are told the correct answer. 
 function submit(){
@@ -238,18 +240,14 @@ function reset(){
   points = 0
   answering = true
   named = false
+  changeLength = false
   name = ""
   age = 0
   error_message = ''
-  for (let r = 0; r < questions.length; r++) {
-        questions[r].selection = ""
-        questions[r].result = ""
-  }
 }
 // Play again function. The player stays the same and the questions are changed.
 function again(){
   changeLength = false
-  shuffle() 
   i = 0
   points = 0
   answering = true
@@ -283,9 +281,11 @@ document.addEventListener('keyup', (event) => {
   if (event.keyCode === 13){
     if (named === false){
       begin()
+    } else if (changeLength === false){
+      chosenLength()
     } else if (i >= questions.length){
       again()
-    }else if (answering === true){
+    } else if (answering === true){
       submit()
     } else if (answering === false){
       next()
@@ -295,7 +295,7 @@ document.addEventListener('keyup', (event) => {
 
 </script>
 
-<h1>Riddles</h1>
+<h1>Quiz</h1>
 <!-- checks if a name has been chosen -->
 {#if named}
 <!-- checks that a game length has been selected -->
@@ -303,7 +303,7 @@ document.addEventListener('keyup', (event) => {
   <!-- checks that the game is still in progress; not all the questions have been answered -->
     {#if (i < questions.length)}
     <!-- the question -->
-    {questions[i].question} 
+    {i + 1}. {questions[i].question} 
     <br>
     <!-- if the question is a multichoice question, it shows all the choices as radio buttons -->
         {#if (questions[i].type == 'multi')}
@@ -421,12 +421,12 @@ document.addEventListener('keyup', (event) => {
 
 <style>
   table {
-    width: 100%;
+    width: 50%;
     border-collapse: collapse;
   }
   table, tr, th {
     border: black
-     solid 2px;
+     solid 1px;
   }
 </style>
 
